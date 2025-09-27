@@ -2,7 +2,9 @@
   <img src="assets/backup-iq_logo.png" alt="BackupIQ" width="300"/>
 </p>
 
-# Intelligent Backup Enterprise System
+# BackupIQ
+
+## Intelligent Backup Enterprise System
 
 **Enterprise-grade backup solution with semantic file organization and production reliability**
 
@@ -36,7 +38,7 @@ make run
 ## 📁 Architecture
 
 ```
-intelligent-backup-enterprise/
+BackupIQ/
 ├── src/                    # Source code
 │   ├── core/              # Core business logic
 │   ├── services/          # Business services
@@ -187,8 +189,8 @@ make test-security     # Security scans
 
 ### Setup
 ```bash
-git clone https://github.com/enterprise/intelligent-backup
-cd intelligent-backup-enterprise
+git clone https://github.com/Senpai-sama7/BackupIQ
+cd BackupIQ
 make dev-setup
 make test
 ```
@@ -223,7 +225,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 🆘 Support
 
-- **Issues**: [GitHub Issues](https://github.com/enterprise/intelligent-backup/issues)
-- **Documentation**: [Wiki](https://github.com/enterprise/intelligent-backup/wiki)
-- **Security**: security@company.com
-- **Commercial**: enterprise@company.com# BackupIQ
+- **Issues**: [GitHub Issues](https://github.com/Senpai-sama7/BackupIQ/issues)
+- **Documentation**: [Wiki](https://github.com/Senpai-sama7/BackupIQ/wiki)
+- **Commercial**: CEO@DouglasMitchell.info# BackupIQ
