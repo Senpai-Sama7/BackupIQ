@@ -1,278 +1,353 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
-
-// --- SVG Icons ---
-// Using inline SVGs for icons to keep it all in one file and reduce dependencies.
-const IconShieldCheck = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-indigo-400">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path>
-    </svg>
-);
-const IconBox = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-indigo-400">
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>
-    </svg>
-);
-const IconActivity = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-indigo-400">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-    </svg>
-);
-const IconCode = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8 text-indigo-400">
-        <polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline>
-    </svg>
-);
-
-
-// --- Pixel Blast Background Component ---
-// Adapted from reactbits.dev for this project.
-// It's memoized to prevent re-renders on parent state changes.
-const PixelBlastBackground = memo(() => {
-    const canvasRef = React.useRef(null);
-
-    const draw = useCallback((ctx, frameCount, ...args) => {
-        const [w, h, columns, symbols, yPositions] = args;
-        ctx.fillStyle = "rgba(17, 24, 39, 0.1)";
-        ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = '#6366f1'; // Indigo color to match theme
-        ctx.font = '15pt monospace';
-
-        yPositions.forEach((y, i) => {
-            const text = String.fromCharCode(symbols[i]);
-            const x = i * 20;
-            ctx.fillText(text, x, y);
-            if (y > 100 + Math.random() * 10000) {
-                yPositions[i] = 0;
-            } else {
-                yPositions[i] = y + 20;
-            }
-        });
-    }, []);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const context = canvas.getContext('2d', { alpha: true });
-        let frameCount = 0;
-        let animationFrameId;
-
-        const w = (canvas.width = window.innerWidth);
-        const h = (canvas.height = window.innerHeight);
-        const columns = Math.floor(w / 20) + 1;
-        const symbols = Array.from({ length: 128 }, (_, i) => 0x30a0 + i);
-        const yPositions = Array(columns).fill(0);
-
-        const render = () => {
-            frameCount++;
-            draw(context, frameCount, w, h, columns, symbols, yPositions);
-            animationFrameId = window.requestAnimationFrame(render);
-        };
-        render();
-
-        const handleResize = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        };
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.cancelAnimationFrame(animationFrameId);
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [draw]);
-
-    return <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full -z-10" />;
-});
-
-
-// --- Main App Component ---
-export default function App() {
-    // --- Data for sections ---
-    const features = [
-        {
-            icon: <IconCode />,
-            title: "Core Backup Engine",
-            description: "Handles scheduled backups, file/database snapshotting, and seamless restore workflows. Supports multiple storage backends like cloud, object storage, and DB dumps."
-        },
-        {
-            icon: <IconBox />,
-            title: "Enterprise-Ready Packaging",
-            description: "Comes with a non-root, multi-stage Dockerfile, Kubernetes manifests, and health/metrics endpoints (/health, /ready, /metrics) for robust, scalable deployments."
-        },
-        {
-            icon: <IconShieldCheck />,
-            title: "Reliability & Security",
-            description: "Engineered for graceful startups/shutdowns, with timeout/retry/backoff patterns. Secrets are externalized, designed for secure integration with managers like HashiCorp Vault."
-        },
-        {
-            icon: <IconActivity />,
-            title: "Observability & Testing",
-            description: "Features structured JSON logging, a Prometheus metrics endpoint, and a full suite of unit, integration, and acceptance tests. Includes sample CI/CD workflows."
-        }
-    ];
-
-    const targetAudience = [
-        { name: "MSPs & IT Agencies", description: "Offer white-label backup services to your clients." },
-        { name: "SaaS Founders & Indie Hackers", description: "Launch your backup solution instantly, skipping months of dev time." },
-        { name: "Ecommerce App Developers", description: "Build Shopify/Shop apps for one-click data recovery." },
-        { name: "Crypto & Web3 Teams", description: "Adapt backup flows for critical blockchain nodes and wallet states." },
-    ];
-
-    return (
-        <div className="bg-gray-900 text-gray-200 font-sans leading-relaxed">
-            <PixelBlastBackground />
-            <div className="relative isolate min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-4">
-                <div
-                    className="absolute inset-0 -z-10 bg-gray-900/50"
-                    style={{
-                        backdropFilter: 'blur(4px)',
-                        WebkitBackdropFilter: 'blur(4px)',
-                    }}
-                ></div>
-
-                <header className="z-10">
-                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 pb-2">
-                        BackupIQ
-                    </h1>
-                    <p className="mt-4 text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto text-gray-300">
-                        An AI-Enabled, Production-Ready Backup & Restore SaaS Platform.
-                    </p>
-                    <p className="mt-6 text-base max-w-2xl mx-auto text-gray-400">
-                        Your turnkey system to eliminate data loss anxiety. Reduce build time from 12 months to under 48 hours.
-                    </p>
-                    <div className="mt-10 flex items-center justify-center gap-x-6">
-                        <a
-                            href="#features"
-                            className="rounded-md bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors duration-300"
-                        >
-                            Explore Features
-                        </a>
-                        <a href="#pitch" className="text-sm font-semibold leading-6 text-gray-300 hover:text-white">
-                            Learn more <span aria-hidden="true">→</span>
-                        </a>
-                    </div>
-                </header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BackupIQ - Enterprise Backup & Restore Platform</title>
+    <meta name="description" content="Deploy your production-ready backup SaaS in under 48 hours. Dockerized, Kubernetes-ready solution for MSPs, SaaS founders, and ecommerce developers.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">🛡️</span>
+                <span class="logo-text">BackupIQ</span>
             </div>
-
-            <main className="relative z-10 bg-gray-900">
-                {/* Features Section */}
-                <section id="features" className="py-20 sm:py-28 px-6 lg:px-8">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center">
-                            <h2 className="text-base font-semibold leading-7 text-indigo-400">Everything Included</h2>
-                            <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">The Blueprint for Modern Data Resilience</p>
-                            <p className="mt-6 text-lg leading-8 text-gray-400">
-                                This isn't just a script. It's a complete, enterprise-grade system engineered for reliability and scale.
-                            </p>
-                        </div>
-                        <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
-                            {features.map((feature) => (
-                                <div key={feature.title} className="relative pl-16">
-                                    <dt className="text-base font-semibold leading-7 text-white">
-                                        <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-lg bg-gray-800 border border-gray-700">
-                                            {feature.icon}
-                                        </div>
-                                        {feature.title}
-                                    </dt>
-                                    <dd className="mt-2 text-base leading-7 text-gray-400">{feature.description}</dd>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Value Proposition Section */}
-                <section className="bg-gray-900/50 py-20 sm:py-28">
-                    <div className="max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-3 gap-12 text-center">
-                        <div className="p-8 rounded-xl bg-gray-800/50 border border-gray-700">
-                            <div className="text-4xl font-bold text-indigo-400">$100K+</div>
-                            <div className="mt-2 text-gray-300">Replacement Cost</div>
-                            <p className="mt-4 text-sm text-gray-400">The engineering effort and salary cost to replicate this system from scratch.</p>
-                        </div>
-                        <div className="p-8 rounded-xl bg-gray-800/50 border border-gray-700">
-                            <div className="text-4xl font-bold text-indigo-400">&lt;48 Hours</div>
-                            <div className="mt-2 text-gray-300">Time-to-Market</div>
-                            <p className="mt-4 text-sm text-gray-400">Skip 6-12 months of development, debugging, and infrastructure setup. Launch now.</p>
-                        </div>
-                        <div className="p-8 rounded-xl bg-gray-800/50 border border-gray-700">
-                            <div className="text-4xl font-bold text-indigo-400">4+ Verticals</div>
-                            <div className="mt-2 text-gray-300">Market Versatility</div>
-                            <p className="mt-4 text-sm text-gray-400">Adaptable for SaaS, Ecommerce, MSPs, Agencies, and emerging Web3 use cases.</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Target Audience Section */}
-                 <section id="who-for" className="py-20 sm:py-28 px-6 lg:px-8">
-                    <div className="max-w-5xl mx-auto text-center">
-                        <h2 className="text-base font-semibold leading-7 text-indigo-400">Built for Builders</h2>
-                        <p className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">Who Would Buy This?</p>
-                        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {targetAudience.map((audience) => (
-                                <div key={audience.name} className="p-6 bg-gray-800/50 border border-gray-700 rounded-lg">
-                                    <h3 className="font-semibold text-white">{audience.name}</h3>
-                                    <p className="mt-2 text-sm text-gray-400">{audience.description}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-
-                {/* Pitch & Licensing Section */}
-                <section id="pitch" className="bg-gray-800 py-20 sm:py-28">
-                    <div className="max-w-7xl mx-auto px-6 lg:px-8 grid md:grid-cols-2 gap-16 items-center">
-                        <div>
-                            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">How to Pitch It</h2>
-                            <p className="mt-4 text-lg text-gray-400">This is how you frame the value.</p>
-                             <div className="mt-8 p-6 border border-dashed border-gray-600 rounded-lg">
-                                <p className="text-lg font-semibold text-indigo-400">“BackupIQ — AI-enabled backup & restore SaaS codebase. Deploy in &lt;48 hours.”</p>
-                            </div>
-                            <ul className="mt-8 space-y-4 text-gray-300">
-                                <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-indigo-400 mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                    <span><strong>Production-Ready:</strong> Docker, Kubernetes, CI/CD, health/metrics/tests.</span>
-                                </li>
-                                <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-indigo-400 mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                    <span><strong>Saves $75K+ and 6–12 months</strong> of engineering and opportunity cost.</span>
-                                </li>
-                                <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-indigo-400 mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                    <span><strong>Adaptable:</strong> Perfect for SaaS, Shopify apps, MSPs, or Web3 projects.</span>
-                                </li>
-                                 <li className="flex items-start">
-                                    <svg className="flex-shrink-0 h-6 w-6 text-indigo-400 mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-                                    <span><strong>License Once, Deploy Forever.</strong> A true asset for your portfolio.</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Licensing vs. Selling</h2>
-                            <p className="mt-4 text-lg text-gray-400">Two paths to monetization.</p>
-                             <div className="mt-8 space-y-6">
-                                <div className="p-6 rounded-lg bg-gray-700/50">
-                                    <h3 className="font-semibold text-white">Non-Exclusive License (~$10K each)</h3>
-                                    <p className="mt-2 text-sm text-gray-400">The smart move. Sell to multiple buyers, create recurring deals, and retain the upside. The ideal path for maximizing returns.</p>
-                                </div>
-                                <div className="p-6 rounded-lg bg-gray-700/50">
-                                    <h3 className="font-semibold text-white">Outright Sale (~$10K–$30K)</h3>
-                                    <p className="mt-2 text-sm text-gray-400">A quick cash injection, but you lose all future rights to the codebase. Best for a fast exit.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </main>
-
-            <footer className="bg-gray-900 border-t border-gray-800">
-                <div className="max-w-7xl mx-auto py-8 px-6 lg:px-8 text-center text-gray-500">
-                     <p>&copy; {new Date().getFullYear()} BackupIQ. All rights reserved. A conceptual product.</p>
-                </div>
-            </footer>
+            
+            <div class="nav-links">
+                <a href="#hero" class="nav-link">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#architecture" class="nav-link">Architecture</a>
+                <a href="#value" class="nav-link">Value</a>
+                <a href="#audience" class="nav-link">Audience</a>
+                <a href="#pricing" class="nav-link">Pricing</a>
+                <button class="cta-button nav-cta">Get Started</button>
+            </div>
+            
+            <div class="nav-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
         </div>
-    );
-}
+    </nav>
 
+    <!-- Hero Section -->
+    <section id="hero" class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">Enterprise-Ready Backup & Restore Platform</div>
+                <h1>Deploy Your Backup SaaS in <span class="highlight">Under 48 Hours</span></h1>
+                <p class="hero-subtitle">
+                    Production-ready intelligent backup and restore platform that can be sold as SaaS, 
+                    white-label MSP solution, or adapted as Shopify/Ecommerce protection app.
+                </p>
+                <div class="hero-actions">
+                    <button class="cta-button primary">Start Free Trial</button>
+                    <button class="cta-button secondary">View Demo</button>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">$75K+</span>
+                        <span class="stat-label">Replacement Cost</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">6-12</span>
+                        <span class="stat-label">Months Saved</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">100%</span>
+                        <span class="stat-label">Production Ready</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Core Features & Capabilities</h2>
+                <p>Everything you need to launch a professional backup service</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Intelligent Backup Engine</h3>
+                    <p>Handles scheduled backups, file/database snapshotting, and restore workflows with configurable storage backends.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🐳</div>
+                    <h3>Enterprise-Ready Packaging</h3>
+                    <p>Dockerized, Kubernetes-ready with health checks, metrics, and comprehensive testing suite included.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Advanced Observability</h3>
+                    <p>Structured JSON logging, Prometheus metrics endpoint, and clear runbook-style readiness checks.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Flexible Deployment</h3>
+                    <p>Adaptable for SaaS, white-labelable by MSPs, or retooled for Shopify/Ecommerce protection.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Reliability & Security</h3>
+                    <p>Graceful startup/shutdown, timeout/retry patterns, and externalized secrets management.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🧪</div>
+                    <h3>Comprehensive Testing</h3>
+                    <p>Unit and integration tests with example CI/CD workflows for linting, testing, and secret scanning.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="architecture-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Enterprise-Grade Architecture</h2>
+                <p>Built with production deployment standards</p>
+            </div>
+            
+            <div class="architecture-content">
+                <div class="architecture-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-node">Frontend Dashboard</div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer">
+                        <div class="arch-node">API Gateway</div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer multi-node">
+                        <div class="arch-node">Backup Service</div>
+                        <div class="arch-node">Restore Service</div>
+                        <div class="arch-node">Scheduler</div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer">
+                        <div class="arch-node">Storage Adapters</div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer multi-node">
+                        <div class="arch-node">Cloud Storage</div>
+                        <div class="arch-node">Database</div>
+                        <div class="arch-node">Object Storage</div>
+                    </div>
+                </div>
+                
+                <div class="architecture-features">
+                    <h3>Technical Highlights</h3>
+                    <ul>
+                        <li>Dockerfile (non-root, multi-stage)</li>
+                        <li>Kubernetes manifests with liveness/readiness probes</li>
+                        <li>docker-compose for quick local spins</li>
+                        <li>Health endpoints (/health, /ready) and metrics (/metrics)</li>
+                        <li>Timeout/retry/backoff patterns for downstream calls</li>
+                        <li>Secrets externalized for secret manager integration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Value Proposition Section -->
+    <section id="value" class="value-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why BackupIQ is Invaluable</h2>
+                <p>Skip the development costs and time investment</p>
+            </div>
+            
+            <div class="value-grid">
+                <div class="value-card">
+                    <h3>Cost Efficiency</h3>
+                    <p>Replacement cost: $75K–$100K in engineering effort. Our solution saves you this significant investment.</p>
+                </div>
+                
+                <div class="value-card">
+                    <h3>Time-to-Market</h3>
+                    <p>Buyers skip 6–12 months of building and can deploy a production-ready system in under 48 hours.</p>
+                </div>
+                
+                <div class="value-card">
+                    <h3>Market Versatility</h3>
+                    <p>Fits multiple verticals: SaaS, Ecommerce, Agencies, Crypto/Web3 with minimal adaptation required.</p>
+                </div>
+                
+                <div class="value-card">
+                    <h3>Production-Ready</h3>
+                    <p>Unlike templates on CodeCanyon/Flippa, this isn't a script — it's a real, tested system ready for enterprise use.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Target Audience Section -->
+    <section id="audience" class="audience-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Who Would Benefit from BackupIQ</h2>
+                <p>Multiple market segments, one powerful solution</p>
+            </div>
+            
+            <div class="audience-cards">
+                <div class="audience-card">
+                    <div class="audience-icon">🏢</div>
+                    <h3>MSPs/IT Agencies</h3>
+                    <p>Want white-label backup offerings to add to their service portfolio without development overhead.</p>
+                </div>
+                
+                <div class="audience-card">
+                    <div class="audience-icon">🚀</div>
+                    <h3>Solo SaaS Founders</h3>
+                    <p>Indie hackers who want to launch a backup service instantly without technical barriers.</p>
+                </div>
+                
+                <div class="audience-card">
+                    <div class="audience-icon">🛍️</div>
+                    <h3>Ecommerce Developers</h3>
+                    <p>Building Shopify/Shop apps for data recovery with "Your shop restored in 1 click" capability.</p>
+                </div>
+                
+                <div class="audience-card">
+                    <div class="audience-icon">⛓️</div>
+                    <h3>Crypto/Web3 Teams</h3>
+                    <p>Adapt backup flows to blockchain nodes/wallets with our extendable architecture.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Licensing Options</h2>
+                <p>Choose the model that works for your business</p>
+            </div>
+            
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Non-Exclusive License</h3>
+                        <div class="price">$10,000</div>
+                        <p>per license</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Multiple buyers possible</li>
+                        <li>Recurring deals</li>
+                        <li>Keep upside potential</li>
+                        <li>License once, deploy forever</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <button class="cta-button primary">Choose License</button>
+                </div>
+                
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Recommended</div>
+                    <div class="pricing-header">
+                        <h3>Outright Sale</h3>
+                        <div class="price">$20,000 - $30,000</div>
+                        <p>one-time payment</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Quick cash infusion</li>
+                        <li>Full rights transfer</li>
+                        <li>Exclusive ownership</li>
+                        <li>Source code ownership</li>
+                        <li>Lifetime updates</li>
+                    </ul>
+                    <button class="cta-button primary">Request Quote</button>
+                </div>
+            </div>
+            
+            <div class="pricing-note">
+                <p>Both options include complete source code, documentation, and deployment support.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Launch Your Backup Service?</h2>
+                <p>Deploy in under 48 hours and start serving customers immediately</p>
+                <div class="cta-actions">
+                    <button class="cta-button primary large">Schedule a Demo</button>
+                    <button class="cta-button secondary large">Download Technical Specs</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span class="logo-icon">🛡️</span>
+                        <span class="logo-text">BackupIQ</span>
+                    </div>
+                    <p>Production-ready backup & restore platform for SaaS founders, MSPs, and ecommerce developers.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#architecture">Architecture</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="#audience">Use Cases</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#" class="resource-link">Documentation</a></li>
+                        <li><a href="#" class="resource-link">API Reference</a></li>
+                        <li><a href="#" class="resource-link">Support</a></li>
+                        <li><a href="#" class="resource-link">Blog</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#" class="resource-link">About</a></li>
+                        <li><a href="#" class="resource-link">Contact</a></li>
+                        <li><a href="#" class="resource-link">Privacy Policy</a></li>
+                        <li><a href="#" class="resource-link">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; <span id="current-year">2024</span> BackupIQ. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
