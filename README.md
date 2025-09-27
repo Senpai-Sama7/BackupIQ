@@ -1,8 +1,11 @@
+<p align="center">
+  <img src="assets/backup-iq_logo.png" alt="BackupIQ" width="300"/>
+</p>
+
 # Intelligent Backup Enterprise System
 
 **Enterprise-grade backup solution with semantic file organization and production reliability**
 
-[![Build Status](https://github.com/enterprise/intelligent-backup/workflows/CI/badge.svg)](https://github.com/enterprise/intelligent-backup/actions)
 [![Coverage](https://codecov.io/gh/enterprise/intelligent-backup/branch/main/graph/badge.svg)](https://codecov.io/gh/enterprise/intelligent-backup)
 [![Security](https://snyk.io/test/github/enterprise/intelligent-backup/badge.svg)](https://snyk.io/test/github/enterprise/intelligent-backup)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
