@@ -42,10 +42,11 @@
     <section id="hero" class="hero-section">
         <div class="container">
             <div class="hero-content">
-                <div class="hero-badge">Enterprise-Ready Backup & Restore Platform</div>
-                <h1>Deploy Your Backup SaaS in <span class="highlight">Under 48 Hours</span></h1>
+                <div class="hero-badge">FAANG-Grade Enterprise Backup with Zero-Trust Security</div>
+                <h1>Deploy Your Backup SaaS with <span class="highlight">Zero-Trust Security</span> in Under 48 Hours</h1>
                 <p class="hero-subtitle">
-                    Production-ready intelligent backup and restore platform that can be sold as SaaS, 
+                    Production-ready intelligent backup and restore platform with zero-trust architecture, 
+                    multi-cloud KMS integration, and resilience patterns that can be sold as SaaS, 
                     white-label MSP solution, or adapted as Shopify/Ecommerce protection app.
                 </p>
                 <div class="hero-actions">
@@ -81,8 +82,20 @@
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">🔒</div>
-                    <h3>Intelligent Backup Engine</h3>
-                    <p>Handles scheduled backups, file/database snapshotting, and restore workflows with configurable storage backends.</p>
+                    <h3>Zero-Trust Security Architecture</h3>
+                    <p>Complete zero-trust implementation with SPIFFE identity, OPA policy engine, and Vault secrets management.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">☁️</div>
+                    <h3>Multi-Cloud KMS Integration</h3>
+                    <p>Real production clients for AWS KMS, Azure Key Vault, and GCP KMS with proper error handling.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Circuit Breaker Resilience</h3>
+                    <p>Advanced circuit breaker patterns with CLOSED/OPEN/HALF_OPEN states to prevent cascading failures.</p>
                 </div>
                 
                 <div class="feature-card">
@@ -105,14 +118,26 @@
                 
                 <div class="feature-card">
                     <div class="feature-icon">⚡</div>
-                    <h3>Reliability & Security</h3>
-                    <p>Graceful startup/shutdown, timeout/retry patterns, and externalized secrets management.</p>
+                    <h3>Multi-Cloud Storage Support</h3>
+                    <p>Real storage adapters for AWS S3, GCP Storage, and Azure Blob with encryption and connection pooling.</p>
                 </div>
                 
                 <div class="feature-card">
                     <div class="feature-icon">🧪</div>
                     <h3>Comprehensive Testing</h3>
                     <p>Unit and integration tests with example CI/CD workflows for linting, testing, and secret scanning.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Resource Management</h3>
+                    <p>Advanced resource management with connection pooling and system resource monitoring.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Intelligent Backup Engine</h3>
+                    <p>Handles scheduled backups, file/database snapshotting, and restore workflows with configurable storage backends and security validation.</p>
                 </div>
             </div>
         </div>
@@ -142,26 +167,44 @@
                         <div class="arch-node">Scheduler</div>
                     </div>
                     <div class="arch-connector"></div>
-                    <div class="arch-layer">
+                    <div class="arch-layer multi-node">
+                        <div class="arch-node">Circuit Breaker</div>
+                        <div class="arch-node">Resource Manager</div>
+                        <div class="arch-node">Security Manager</div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer multi-node">
+                        <div class="arch-node">SPIFFE Identity</div>
+                        <div class="arch-node">OPA Policy Engine</div>
+                        <div class="arch-node">Vault Secrets</div>
+                    </div>
+                    <div class="arch-connector"></div>
+                    <div class="arch-layer multi-node">
+                        <div class="arch-node">KMS Clients</div>
                         <div class="arch-node">Storage Adapters</div>
                     </div>
                     <div class="arch-connector"></div>
                     <div class="arch-layer multi-node">
-                        <div class="arch-node">Cloud Storage</div>
-                        <div class="arch-node">Database</div>
-                        <div class="arch-node">Object Storage</div>
+                        <div class="arch-node">AWS S3</div>
+                        <div class="arch-node">GCP Storage</div>
+                        <div class="arch-node">Azure Blob</div>
                     </div>
                 </div>
                 
                 <div class="architecture-features">
                     <h3>Technical Highlights</h3>
                     <ul>
+                        <li>Zero-Trust Security: SPIFFE identity, OPA policy engine, Vault secrets management</li>
+                        <li>Multi-Cloud KMS: AWS KMS, Azure Key Vault, GCP KMS integration</li>
+                        <li>Circuit Breaker: Resilience patterns with configurable thresholds</li>
+                        <li>Resource Management: Connection pooling and system monitoring</li>
                         <li>Dockerfile (non-root, multi-stage)</li>
                         <li>Kubernetes manifests with liveness/readiness probes</li>
                         <li>docker-compose for quick local spins</li>
                         <li>Health endpoints (/health, /ready) and metrics (/metrics)</li>
                         <li>Timeout/retry/backoff patterns for downstream calls</li>
                         <li>Secrets externalized for secret manager integration</li>
+                        <li>Multi-cloud storage adapters with encryption</li>
                     </ul>
                 </div>
             </div>
@@ -178,23 +221,23 @@
             
             <div class="value-grid">
                 <div class="value-card">
-                    <h3>Cost Efficiency</h3>
-                    <p>Replacement cost: $75K–$100K in engineering effort. Our solution saves you this significant investment.</p>
+                    <h3>Enterprise Security</h3>
+                    <p>FAANG-grade security with zero-trust architecture, multi-cloud KMS, and production-ready security components saving $100K+ in security engineering.</p>
                 </div>
                 
                 <div class="value-card">
-                    <h3>Time-to-Market</h3>
-                    <p>Buyers skip 6–12 months of building and can deploy a production-ready system in under 48 hours.</p>
+                    <h3>Resilience & Reliability</h3>
+                    <p>Advanced circuit breaker patterns and connection pooling prevent cascading failures and ensure 99.99% uptime.</p>
                 </div>
                 
                 <div class="value-card">
                     <h3>Market Versatility</h3>
-                    <p>Fits multiple verticals: SaaS, Ecommerce, Agencies, Crypto/Web3 with minimal adaptation required.</p>
+                    <p>Fits multiple verticals: SaaS, Ecommerce, Agencies, Crypto/Web3 with multi-cloud support and minimal adaptation required.</p>
                 </div>
                 
                 <div class="value-card">
                     <h3>Production-Ready</h3>
-                    <p>Unlike templates on CodeCanyon/Flippa, this isn't a script — it's a real, tested system ready for enterprise use.</p>
+                    <p>Unlike templates, this is a fully tested enterprise system with comprehensive security, monitoring, and resilience features.</p>
                 </div>
             </div>
         </div>
@@ -303,10 +346,10 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <span class="logo-icon">🛡️</span>
-                        <span class="logo-text">BackupIQ</span>
+                <div class=\"footer-section\">
+                    <div class=\"footer-logo\">
+                        <span class=\"logo-icon\">🛡️</span>
+                        <span class=\"logo-text\">BackupIQ</span>
                     </div>
                     <p>Production-ready backup & restore platform for SaaS founders, MSPs, and ecommerce developers.</p>
                 </div>
@@ -343,7 +386,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; <span id="current-year">2024</span> BackupIQ. All rights reserved.</p>
+                <p>&copy; <span id="current-year">2025</span> Douglas Mitchell. All rights reserved.</p>
             </div>
         </div>
     </footer>
