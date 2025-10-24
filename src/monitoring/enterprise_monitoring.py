@@ -8,6 +8,7 @@ import time
 import json
 import logging
 import threading
+import contextvars
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 from dataclasses import dataclass, asdict
@@ -119,7 +120,11 @@ class EnterpriseHealthChecker:
                     result = check_func()
                     self.checks[name] = result
                     self.last_check_times[name] = time.time()
-                except Exception:
+                except Exception as e:
+                    logging.getLogger(__name__).warning(
+                        f"Health check '{name}' failed: {type(e).__name__}: {str(e)}",
+                        extra={"health_check": name, "exception": type(e).__name__, "error": str(e)}
+                    )
                     self.checks[name] = False
                     self.last_check_times[name] = time.time()
                 time.sleep(interval)
@@ -198,8 +203,9 @@ class EnterpriseMonitoring:
         self.health_checker = EnterpriseHealthChecker()
         self.audit_logger = EnterpriseAuditLogger(self.logger)
 
-        # Correlation context
-        self.correlation_context = threading.local()
+        # Correlation context (async-safe using contextvars)
+        self._correlation_context_var: contextvars.ContextVar[Optional[CorrelationContext]] = \
+            contextvars.ContextVar('correlation_context', default=None)
 
     def initialize(self):
         """Initialize monitoring systems"""
@@ -234,8 +240,14 @@ class EnterpriseMonitoring:
 
             self.metrics.update_resource_usage("disk", disk_percent)
             return disk_percent < 90
-        except:
-            return True
+        except (OSError, RuntimeError) as e:
+            self.logger.get_logger().warning(
+                f"Disk space check failed: {type(e).__name__}: {str(e)}",
+                extra={"exception": type(e).__name__, "error": str(e)}
+            )
+            return True  # Assume healthy if check fails
+        except ImportError:
+            return True  # Skip check if shutil not available
 
     @contextmanager
     def operation_context(self, operation_name: str, **metadata):
@@ -243,13 +255,13 @@ class EnterpriseMonitoring:
         correlation_id = str(uuid.uuid4())
         operation_id = f"{operation_name}_{int(time.time())}"
 
-        # Set correlation context
+        # Set correlation context (async-safe)
         context = CorrelationContext(
             correlation_id=correlation_id,
             operation_id=operation_id,
             start_time=time.time()
         )
-        self.correlation_context.value = context
+        token = self._correlation_context_var.set(context)
 
         # Get logger with correlation context
         logger = self.logger.get_logger(
@@ -273,10 +285,13 @@ class EnterpriseMonitoring:
                         duration_seconds=duration,
                         error=str(e))
             raise
+        finally:
+            # Reset context after operation completes
+            self._correlation_context_var.reset(token)
 
     def get_current_context(self) -> Optional[CorrelationContext]:
-        """Get current correlation context"""
-        return getattr(self.correlation_context, 'value', None)
+        """Get current correlation context (async-safe)"""
+        return self._correlation_context_var.get()
 
     def get_health_status(self) -> Dict[str, Any]:
         """Get comprehensive health status"""
