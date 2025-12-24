@@ -8,7 +8,7 @@ __author__ = "Enterprise Development Team"
 
 from .backup_orchestrator import EnterpriseBackupOrchestrator
 from .config_manager import EnterpriseConfigManager
-from .monitoring import EnterpriseMonitoring
+from ..monitoring.enterprise_monitoring import EnterpriseMonitoring
 
 __all__ = [
     "EnterpriseBackupOrchestrator",
